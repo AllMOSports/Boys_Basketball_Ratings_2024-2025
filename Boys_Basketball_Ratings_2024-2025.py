@@ -240,6 +240,15 @@ def build_id_to_classname(team_to_class, schools_csv=SCHOOLS_CSV):
         "430": "Russellville",
         "463": "Stockton",
         "207": "Sullivan",
+        "445": "Smithville",
+        "197": "South Callaway",
+        "450": "South Pemiscot",
+        "458": "St. Elizabeth",
+        "460": "Stanberry",
+        "465": "Stover",
+        "193": "Slater",
+        "456": "Sparta",
+        "468": "Summersville",
     }
  
     df = pd.read_csv(schools_csv)
@@ -404,6 +413,32 @@ def scrape_full_season(id_to_classname, known_teams):
         print(f"  [TIMING] {len(slow_days)} slow day(s) (>3s each):")
         for d, secs in slow_days:
             print(f"    {d}: {secs:.1f}s")
+ 
+    # ---------------------------------------------------------------
+    # SECOND-PASS RETRY -- automatically re-attempt any date that never
+    # returned data on the first pass. Most of these are transient
+    # (a single slow/dropped response on MSHSAA's end), not permanent
+    # data gaps, which is why the set of "0 games" teams has been
+    # shifting from run to run rather than staying fixed. Retrying here
+    # means those transient misses self-heal without anyone manually
+    # tracking down IDs and adding MANUAL_GAMES entries for something
+    # that was never actually missing from MSHSAA in the first place.
+    # ---------------------------------------------------------------
+    if failed_days:
+        print(f"\n  Retrying {len(failed_days)} failed date(s) "
+              f"(second pass)...")
+        still_failed = []
+        for d, reason in failed_days:
+            time.sleep(1.0)   # a bit more breathing room than the main pass
+            print(f"  Retrying {d}...", end=" ", flush=True)
+            day_games, fail_reason = scrape_date(d, id_to_classname, known_teams, session)
+            print(f"{len(day_games)} games")
+            if fail_reason is None:
+                all_games.extend(day_games)
+            else:
+                still_failed.append((d, fail_reason))
+        failed_days = still_failed
+ 
     if failed_days:
         print(f"\n  *** {len(failed_days)} date(s) NEVER returned data, "
               f"even after retry -- these dates may be missing real "
