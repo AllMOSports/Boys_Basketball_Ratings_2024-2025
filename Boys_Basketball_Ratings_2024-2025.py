@@ -11,14 +11,14 @@ import time
 # CONFIGURATION
 # ---------------------------------------------------------------------------
  
-SEASON_YEAR   = 2025   # NOTE: labeled by the year the season *starts* (Nov 2025),
+SEASON_YEAR   = 2024   # NOTE: labeled by the year the season *starts* (Nov 2024),
                         # matching football's convention. Basketball runs Nov->Mar,
                         # so confirm this against whatever year-label your existing
                         # boys basketball repo/classifications.json already uses
                         # before trusting the output filenames.
-SEASON_START  = date(2025, 11, 1)   # a couple weeks before games typically tip off,
+SEASON_START  = date(2024, 11, 1)   # a couple weeks before games typically tip off,
                                      # to safely catch early jamborees/scrimmage results
-SEASON_END    = date(2026, 4, 1)
+SEASON_END    = date(2025, 4, 1)
 BASE_URL      = "https://www.mshsaa.org/activities/scoreboard.aspx?alg=5&date={}"
 MAX_POINTS    = 150    # basketball scores run higher than football; 150 comfortably
                         # covers OT shootouts without being so loose it lets garbage
