@@ -160,7 +160,65 @@ def build_id_to_classname(team_to_class, schools_csv=SCHOOLS_CSV):
     # dict, let report_missing_teams() surface every classifications.json
     # school with zero scraped games, then look up each one's real s= ID
     # from the alg=5 scoreboard/schedule page and add it here.
+    #
+    # Below: the 28 non-co-op schools identified as missing entirely from
+    # mshsaa_schools.csv (cross-referenced against boys_basketball_scoreboard
+    # _2024.csv on 2024-25 data). Fill in each "TODO" with the real school ID
+    # pulled from the s= parameter on that school's MSHSAA schedule page.
+    #
+    # NOT included here -- these 6 are co-op names and should be resolved via
+    # Aliases.json instead of MANUAL_OVERRIDES, since MSHSAA's scoreboard
+    # likely lists each co-op partner separately rather than combined:
+    #   Cainsville with Ridgeway
+    #   Collegiate School of Med-Bio Science with Central Visual and Performing Arts
+    #   Gilman City with North Daviess
+    #   Hale with Bosworth
+    #   Montrose with Ballard
+    #   Paris with Faith Walk
+    #
+    # ALSO not included -- Russellville (430), Stover (449), and Sullivan (200)
+    # already resolve fine (they're in mshsaa_schools.csv with valid IDs) but
+    # still show 0 games. That's a MANUAL_GAMES backfill issue, not a name-
+    # resolution issue -- see the MANUAL_GAMES section below.
+    # NOTE: each key below MUST be a unique school ID string, replacing the
+    # "TODO_<school>" placeholder. Duplicate dict keys (e.g. two literal
+    # "TODO" strings) would silently collapse to a single entry in Python --
+    # these placeholders are made unique specifically to avoid that trap.
     MANUAL_OVERRIDES = {
+        "431": "Salisbury",
+        "432": "Santa Fe",
+        "434": "Scotland County",
+        "435": "Scott City",
+        "437": "Seymour",
+        "438": "Sheldon",
+        "440": "Silex",
+        "443": "Skyline",
+        "194": "Smith-Cotton",
+        "446": "South Harrison",
+        "447": "South Holt",
+        "448": "South Iron",
+        "453": "Southland",
+        "454": "Southwest (Livingston County)",
+        "455": "Southwest (Washburn)",
+        "549": "St. Mary's South Side",
+        "205": "Steelville",
+        "463": "Stockton",
+        "464": "Stoutland",
+        "466": "Strafford",
+        "467": "Sturgeon",
+        "208": "Sumner",
+        "473": "Tina-Avalon",
+        "198": "Truman",
+        "199": "Twin Rivers",
+        "204": "Van Horn",
+        "206": "Vashon",
+        "503": "Winston",
+        "250": "Cainsville with Ridgeway",
+        "985": "Collegiate School of Med-Bio Science with Central Visual and Performing Arts",
+        "301": "Gilman City with North Daviess",
+        "309": "Hale with Bosworth",
+        "135": "Montrose with Ballard",
+        "156": "Paris with Faith Walk",
     }
  
     df = pd.read_csv(schools_csv)
