@@ -6,6 +6,24 @@ import re
 import pandas as pd
 from datetime import datetime, date, timedelta
 import time
+import socket
+ 
+# ---------------------------------------------------------------------------
+# NETWORK WORKAROUND -- force IPv4-only DNS resolution
+# ---------------------------------------------------------------------------
+# GitHub Actions ubuntu-latest runners have intermittently broken/absent
+# IPv6 routing. If www.mshsaa.org's DNS returns an IPv6 (AAAA) address,
+# Python's socket layer can try that first and fail immediately with
+# [Errno 101] Network is unreachable -- and depending on the retry/adapter
+# config, that failure can end up applying to every single request in the
+# run instead of cleanly falling back to IPv4. This has now recurred across
+# multiple separate runs (not a one-off blip), so patch getaddrinfo()
+# process-wide to only ever return IPv4 addresses, sidestepping the issue
+# entirely rather than hoping a re-run gets lucky.
+_orig_getaddrinfo = socket.getaddrinfo
+def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _getaddrinfo_ipv4_only
  
 # ---------------------------------------------------------------------------
 # CONFIGURATION
@@ -219,6 +237,9 @@ def build_id_to_classname(team_to_class, schools_csv=SCHOOLS_CSV):
         "309": "Hale with Bosworth",
         "135": "Montrose with Ballard",
         "156": "Paris with Faith Walk",
+        "430": "Russellville",
+        "463": "Stockton",
+        "207": "Sullivan",
     }
  
     df = pd.read_csv(schools_csv)
